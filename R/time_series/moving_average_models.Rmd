@@ -1,0 +1,33 @@
+---
+title: "Moving average models"
+author: "Semiramis Castro-Jaimes"
+date: "31/7/2020"
+output: html_document
+---
+
+## Simulate data of a moving average (MA) process
+```{r}
+set.seed(1)
+b <- c(0.8, 0.6, 0.4)
+x <- w <- rnorm(1000)
+for (t in 4:1000) {for (j in 1:3) x[t] <- x[t] + b[j] * w[t - j]}
+plot(x, type = "l")
+```
+## Get the autocorrelation
+```{r}
+acf(x)
+```
+As expected, the MA(3) model has the first 3 lags as significant
+
+
+## Fit the simulated data to a MA process
+```{r}
+x.ma <- arima(x, order = c(0, 0, 3))
+x.ma
+```
+
+```{r}
+b
+```
+The estimated parameters are very similar to the parameters used for the simulation
+

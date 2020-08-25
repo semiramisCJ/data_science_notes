@@ -1,0 +1,39 @@
+---
+title: "Autoregressive models"
+author: "Semiramis Castro-Jaimes"
+date: "31/7/2020"
+output: html_document
+---
+
+## Notes
+The code follows the guide of the books 
+
+- "Introductory Time Series with R" (2009) https://www.springer.com/gp/book/9780387886978
+
+- "Introduction to Time Series Analysis and Forecasting" (2008). Link to the second edition (2015): https://www.wiley.com/en-us/Introduction+to+Time+Series+Analysis+and+Forecasting%2C+2nd+Edition-p-9781118745113
+
+
+## Simulation of an auto-regressive (AR) process
+The AR model assumes that the values can be predicted using solely the previous values (historical data); hence the name "autoregressive"
+```{r}
+set.seed(1)
+x <- w <- rnorm(100)
+for (t in 2:100) x[t] <- 0.7 * x[t - 1] + w[t]
+plot(x, type = "l")
+
+```
+
+## Get the autocorrelation plot
+```{r}
+acf(x)
+```
+The decreasing sinusoidal pattern is typical of a stationary time series
+
+
+## Partial autocorrelation plot
+"The partial autocorrelation at lag k results after removing the effect of any correlations due to terms at shorter lags"
+```{r}
+pacf(x)
+```
+Here only the first lag is significative
+

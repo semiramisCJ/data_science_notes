@@ -1,0 +1,125 @@
+---
+title: "Time series AirPassengers"
+author: "Semiramis Castro-Jaimes"
+date: "26/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Notes
+The code follows the guide of the books 
+
+- "Introductory Time Series with R" (2009) https://www.springer.com/gp/book/9780387886978
+
+- "Introduction to Time Series Analysis and Forecasting" (2008). Link to the second edition (2015): https://www.wiley.com/en-us/Introduction+to+Time+Series+Analysis+and+Forecasting%2C+2nd+Edition-p-9781118745113
+
+
+## Load data 
+The dataset is available in base R
+This dataset has be number of passengers (x1000) across time
+```{r}
+data(AirPassengers)
+AP <- AirPassengers
+class(AP)
+```
+## Explore data
+```{r}
+start(AP); end(AP); frequency(AP)
+```
+The data is anual; from 1949 to 1960
+
+```{r}
+summary(AP)
+```
+
+## Plot the data
+```{r}
+plot(AP, ylab = "Passengers (1000's)")
+```
+
+## Aggregate data anually
+```{r}
+plot(aggregate(AP))
+```
+We still see an increasing trend
+
+## Plot the data by cycle
+We capture the seasonal nature of the data
+```{r}
+boxplot(AP ~ cycle(AP))
+```
+We see that there is an increase in the number of passengers during the months June to September. This overlaps with the vacation period in summer
+
+## Decompose the time series
+```{r}
+plot(decompose(AP, type="additive"))
+```
+
+```{r}
+plot(decompose(AP, type="multiplicative"))
+```
+
+```{r}
+AP_decom <- decompose(AP, type = "multiplicative")
+str(AP_decom)
+```
+```{r}
+Trend <- AP_decom$trend
+Seasonal <- AP_decom$seasonal
+ts.plot(cbind(Trend, Trend * Seasonal), lty = 1:2)
+```
+
+```{r}
+plot(AP_decom$random)
+```
+
+```{r}
+plot(stl(AP, s.window=2))
+
+```
+
+```{r}
+str(stl(AP, s.window=2))
+```
+## Autocorrelation for raw data (only for exploration; not for analysis)
+```{r}
+acf(AP)
+```
+
+## Scatterplot of autocorrelations (lag 1)
+```{r}
+#length(AP)
+plot(AP[1:143], AP[2:144])
+
+```
+
+## Random component plot (after decomposing into seasonality & trend)
+```{r}
+plot(AP_decom$random[7:138])
+```
+
+## Autocorrelation of the decomposed data (random component)
+```{r}
+acf(AP_decom$random[7:138])
+```
+If we square the highest peak (around 0.4), it says that the linear dependency of x(t) on x(t+1) would only explain 0.16% of variance in x(t) 
+
+## Holt-Winters smoothing
+```{r}
+AP.hw <- HoltWinters(AP, seasonal = "mult")
+plot(AP.hw)
+```
+## Forecasting 4 years
+```{r}
+AP.predict <- predict(AP.hw, n.ahead = 4 * 12)
+ts.plot(AP, AP.predict, lty = 1:2)
+```
+
+```{r}
+print(AP.hw)
+#print(AP.hw$beta)
+#print(AP.hw$gamma)
+```
+
